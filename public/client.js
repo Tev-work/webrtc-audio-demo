@@ -3,8 +3,11 @@ var divSelectRoom = document.getElementById("selectRoom");
 var divConferenceRoom = document.getElementById("conferenceRoom");
 var btnGoBoth = document.getElementById("goBoth");
 var btnGoVideoOnly = document.getElementById("goVideoOnly");
+var btnGoAudioOnly = document.getElementById("goAudioOnly");
 var localVideo = document.getElementById("localVideo");
 var remoteVideo = document.getElementById("remoteVideo");
+var localAudio = document.getElementById("localAudio");
+var remoteAudio = document.getElementById("remoteAudio");
 var btnMute = document.getElementById("mute");
 var listAudioEvents = document.getElementById("audioEvents");
 
@@ -28,15 +31,20 @@ var isCaller;
 // Let's do this
 var socket = io();
 
-btnGoBoth.onclick = () => initiateCall(true);
-btnGoVideoOnly.onclick = () => initiateCall(false);
+btnGoBoth.onclick = () => initiateCall(true, true);
+btnGoVideoOnly.onclick = () => initiateCall(false, true);
+btnGoAudioOnly.onclick = () => initiateCall(true, false);
 btnMute.onclick = toggleAudio;
 
-function initiateCall(audio) {
+function initiateCall(audio, video) {
     streamConstraints = {
-        video: true,
         audio: audio
     }
+
+    if (video !== void 0) {
+        streamConstraints.video = video;
+    }
+    
     socket.emit('create or join', roomNumber);
     divSelectRoom.style = "display: none;";
     divConferenceRoom.style = "display: block;";
@@ -114,8 +122,13 @@ function onIceCandidate(event) {
 }
 
 function onAddStream(event) {
-    remoteVideo.src = URL.createObjectURL(event.stream);
     remoteStream = event.stream;
+    
+    if (remoteStream.getVideoTracks().length > 0) {
+        remoteVideo.src = URL.createObjectURL(remoteStream);    
+    } else {
+        remoteAudio.src = URL.createObjectURL(remoteStream);
+    }
     if (remoteStream.getAudioTracks().length > 0) {
         addAudioEvent('Remote user is sending Audio');
     } else {
@@ -144,7 +157,12 @@ function setLocalAndAnswer(sessionDescription) {
 //utility functions
 function addLocalStream(stream) {
     localStream = stream;
-    localVideo.src = URL.createObjectURL(stream);
+    
+    if (streamConstraints.video) {
+        localVideo.src = URL.createObjectURL(stream);        
+    } else {
+        localAudio.src = URL.createObjectURL(stream);
+    }
 
     if (stream.getAudioTracks().length > 0) {
         btnMute.style = "display: block";

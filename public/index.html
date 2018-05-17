@@ -21,11 +21,14 @@
     <div id="selectRoom">
         <button id="goBoth">Video and Audio</button>
         <button id="goVideoOnly">Video only</button>
+        <button id="goAudioOnly">Audio only</button>
     </div>
 
     <div id="conferenceRoom" style="display:none">
         <video id="localVideo" autoplay></video>
         <video id="remoteVideo" autoplay></video>
+        <audio id="localAudio" autoplay></audio>
+        <audio id="remoteAudio" autoplay></audio>
         <br/>
         <span id="mute" style="display:none">Toggle Audio</span>
         <h2>Remote audio events</h2>
