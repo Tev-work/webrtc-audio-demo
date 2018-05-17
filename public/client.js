@@ -122,7 +122,7 @@ function onIceCandidate(event) {
 
 function onAddStream(event) {
     remoteStream = event.stream;
-    
+
     if (remoteStream.getVideoTracks().length > 0) {
         remoteVideo.src = URL.createObjectURL(remoteStream);    
     } else {
@@ -136,6 +136,7 @@ function onAddStream(event) {
 }
 
 function setLocalAndOffer(sessionDescription) {
+    modifySdp(sessionDescription, 'offer');    
     rtcPeerConnection.setLocalDescription(sessionDescription);
     socket.emit('offer', {
         type: 'offer',
@@ -145,6 +146,7 @@ function setLocalAndOffer(sessionDescription) {
 }
 
 function setLocalAndAnswer(sessionDescription) {
+    modifySdp(sessionDescription, 'answer');
     rtcPeerConnection.setLocalDescription(sessionDescription);
     socket.emit('answer', {
         type: 'answer',
@@ -188,4 +190,19 @@ function addAudioEvent(event) {
     var p = document.createElement("p");
     p.appendChild(document.createTextNode(event));
     listAudioEvents.appendChild(p);
+}
+
+function modifySdp(sessionDescription, sdpType) {
+    let sdp = sessionDescription.sdp;
+
+    console.log('original', sdpType, 'sdp:', sdp);
+
+    sdp = sdp.replace(/a=ssrc/g, 'a=xssrc');
+    sdp = sdp.replace(/a=msid-semantic/g, 'a=xmsid-semantic');
+    sdp = sdp.replace(/a=mid/g, 'a=xmid');
+    sdp = sdp.replace(/a=group:BUNDLE/g, 'a=xgroup:BUNDLE');
+
+    console.warn('modified sdp:', sdp);
+
+    return sessionDescription.sdp = sdp;
 }
