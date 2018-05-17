@@ -6,7 +6,6 @@ var btnGoVideoOnly = document.getElementById("goVideoOnly");
 var btnGoAudioOnly = document.getElementById("goAudioOnly");
 var localVideo = document.getElementById("localVideo");
 var remoteVideo = document.getElementById("remoteVideo");
-var localAudio = document.getElementById("localAudio");
 var remoteAudio = document.getElementById("remoteAudio");
 var btnMute = document.getElementById("mute");
 var listAudioEvents = document.getElementById("audioEvents");
@@ -161,7 +160,7 @@ function addLocalStream(stream) {
     if (streamConstraints.video) {
         localVideo.src = URL.createObjectURL(stream);        
     } else {
-        localAudio.src = URL.createObjectURL(stream);
+        // pass, for easy testing of audio getting through
     }
 
     if (stream.getAudioTracks().length > 0) {
